@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Incidents</title>
+    <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<main class="container">
+    <div class="page-title">
+        <h1>Incidents HSE</h1>
+        <a class="btn" href="/incidents/new" sec:authorize="hasAnyRole('ADMIN','DECLARANT','RESPONSABLE_HSE')">Nouvelle declaration</a>
+    </div>
+    <p class="flash" th:if="${message}" th:text="${message}"></p>
+    <p class="flash error" th:if="${error}" th:text="${error}"></p>
+    <section class="panel">
+        <table>
+            <thead><tr><th>Reference</th><th>Titre</th><th>Type</th><th>Gravite</th><th>Risque</th><th>Statut</th><th>Responsable</th><th></th></tr></thead>
+            <tbody>
+            <tr th:each="incident : ${incidents}">
+                <td th:text="${incident.reference}"></td>
+                <td th:text="${incident.titre}"></td>
+                <td th:text="${incident.typeIncident}"></td>
+                <td><span class="badge" th:text="${incident.gravite}"></span></td>
+                <td th:text="${incident.niveauRisque}"></td>
+                <td th:text="${incident.statut}"></td>
+                <td th:text="${incident.responsableTraitement != null ? incident.responsableTraitement.nomComplet : '-'}"></td>
+                <td>
+                    <div class="actions-inline">
+                        <a th:href="@{/incidents/{id}(id=${incident.id})}">Ouvrir</a>
+                        <form method="post" th:action="@{/incidents/{id}/take(id=${incident.id})}" sec:authorize="hasRole('TECHNICIEN')" th:if="${incident.statut.name() != 'CLOTURE' and incident.statut.name() != 'RESOLU'}">
+                            <button type="submit">Prendre</button>
+                        </form>
+                        <form method="post" th:action="@{/incidents/{id}/resolve(id=${incident.id})}" sec:authorize="hasAnyRole('ADMIN','RESPONSABLE_HSE','TECHNICIEN')" th:if="${incident.statut.name() != 'CLOTURE' and incident.statut.name() != 'RESOLU'}">
+                            <button class="btn success" type="submit">Resolu</button>
+                        </form>
+                        <form method="post" th:action="@{/incidents/{id}/close(id=${incident.id})}" sec:authorize="hasAnyRole('ADMIN','RESPONSABLE_HSE')" th:if="${incident.statut.name() != 'CLOTURE'}">
+                            <button class="btn success" type="submit">Cloturer</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+</body>
+</html>

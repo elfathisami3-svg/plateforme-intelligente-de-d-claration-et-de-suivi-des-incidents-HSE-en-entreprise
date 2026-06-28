@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>Notifications</title><link rel="stylesheet" href="/css/app.css"></head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<main class="container">
+    <h1>Notifications</h1>
+    <section class="panel">
+        <table>
+            <thead><tr><th>Date</th><th>Type</th><th>Message</th><th>Incident</th></tr></thead>
+            <tbody>
+            <tr th:each="notification : ${notifications}">
+                <td th:text="${#temporals.format(notification.dateEnvoi, 'dd/MM/yyyy HH:mm')}"></td>
+                <td th:text="${notification.typeNotification}"></td>
+                <td th:text="${notification.message}"></td>
+                <td>
+                    <a th:if="${notification.incident != null}" th:href="@{/incidents/{id}(id=${notification.incident.id})}" th:text="${notification.incident.reference}"></a>
+                    <span th:if="${notification.incident == null}">-</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+</body>
+</html>

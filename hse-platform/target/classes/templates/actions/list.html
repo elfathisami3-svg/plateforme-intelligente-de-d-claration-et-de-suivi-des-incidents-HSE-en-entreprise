@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head><meta charset="UTF-8"><title>Actions</title><link rel="stylesheet" href="/css/app.css"></head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<main class="container">
+    <div class="page-title"><h1>Actions correctives</h1><a class="btn" href="/actions/new" sec:authorize="hasAnyRole('ADMIN','RESPONSABLE_HSE','TECHNICIEN')">Nouvelle action</a></div>
+    <p class="flash" th:if="${message}" th:text="${message}"></p>
+    <p class="flash error" th:if="${error}" th:text="${error}"></p>
+    <section class="panel">
+        <table>
+            <thead><tr><th>Incident</th><th>Description</th><th>Responsable</th><th>Echeance</th><th>Etat</th><th>Compte rendu</th></tr></thead>
+            <tbody>
+            <tr th:each="action : ${actions}">
+                <td th:text="${action.incident != null ? action.incident.reference : '-'}"></td>
+                <td th:text="${action.description}"></td>
+                <td th:text="${action.responsable != null ? action.responsable.nomComplet : '-'}"></td>
+                <td th:text="${action.dateEcheance}"></td>
+                <td th:text="${action.etat}"></td>
+                <td>
+                    <form class="inline-form" method="post" th:action="@{/actions/{id}/etat(id=${action.id})}" sec:authorize="hasAnyRole('ADMIN','RESPONSABLE_HSE','TECHNICIEN')">
+                        <select name="etat">
+                            <option th:each="etat : ${etats}" th:value="${etat}" th:text="${etat}" th:selected="${etat == action.etat}"></option>
+                        </select>
+                        <textarea name="resultat" placeholder="Compte rendu ou justificatif" th:text="${action.resultat}"></textarea>
+                        <button type="submit">Mettre a jour</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,10 @@
+package hse.model;
+
+public enum TypeIncident {
+    ACCIDENT_TRAVAIL,
+    QUASI_INCIDENT,
+    INCIDENT_ENVIRONNEMENTAL,
+    SITUATION_DANGEREUSE,
+    NON_CONFORMITE
+}
+

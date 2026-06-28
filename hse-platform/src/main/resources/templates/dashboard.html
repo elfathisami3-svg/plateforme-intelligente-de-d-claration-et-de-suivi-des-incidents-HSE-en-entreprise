@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard HSE</title>
+    <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<main class="container">
+    <section class="hero">
+        <div>
+            <p class="eyebrow">Plateforme HSE</p>
+            <h1>Tableau de bord</h1>
+            <p>Centralisation du cycle de vie des incidents: declaration, qualification, traitement, actions et cloture.</p>
+        </div>
+    </section>
+
+    <section class="metrics">
+        <article><span>Total incidents</span><strong th:text="${stats.total}">0</strong></article>
+        <article><span>Ouverts</span><strong th:text="${stats.ouverts}">0</strong></article>
+        <article><span>Critiques</span><strong th:text="${stats.critiques}">0</strong></article>
+        <article><span>Clotures</span><strong th:text="${stats.clotures}">0</strong></article>
+        <article><span>Actions en retard</span><strong th:text="${stats.actionsRetard}">0</strong></article>
+    </section>
+
+    <section class="panel">
+        <div class="panel-header">
+            <h2>Derniers incidents</h2>
+            <a class="btn" href="/incidents/new" sec:authorize="hasAnyRole('ADMIN','DECLARANT','RESPONSABLE_HSE')">Declarer un incident</a>
+        </div>
+        <table>
+            <thead><tr><th>Reference</th><th>Titre</th><th>Gravite</th><th>Statut</th><th>Priorite</th><th></th></tr></thead>
+            <tbody>
+            <tr th:each="incident : ${incidents}">
+                <td th:text="${incident.reference}"></td>
+                <td th:text="${incident.titre}"></td>
+                <td><span class="badge" th:text="${incident.gravite}"></span></td>
+                <td th:text="${incident.statut}"></td>
+                <td th:text="${incident.priorite}"></td>
+                <td><a th:href="@{/incidents/{id}(id=${incident.id})}">Detail</a></td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="panel">
+        <h2>Traçabilite recente</h2>
+        <ul class="timeline">
+            <li th:each="h : ${historique}">
+                <strong th:text="${h.actionEffectuee}"></strong>
+                <span th:text="${h.incident != null ? h.incident.reference : '-'}"></span>
+                <small th:text="${#temporals.format(h.dateAction, 'dd/MM/yyyy HH:mm')}"></small>
+            </li>
+        </ul>
+    </section>
+</main>
+</body>
+</html>

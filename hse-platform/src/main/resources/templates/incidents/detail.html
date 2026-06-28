@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Detail incident</title>
+    <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<main class="container">
+    <p class="flash" th:if="${message}" th:text="${message}"></p>
+    <p class="flash error" th:if="${error}" th:text="${error}"></p>
+    <div class="page-title">
+        <div>
+            <h1 th:text="${incident.reference + ' - ' + incident.titre}"></h1>
+            <p th:text="${incident.description}"></p>
+        </div>
+        <div class="actions-inline">
+            <a class="btn" th:href="@{/incidents/{id}/edit(id=${incident.id})}">Modifier</a>
+            <form method="post" th:action="@{/incidents/{id}/validate(id=${incident.id})}" sec:authorize="hasAnyRole('ADMIN','RESPONSABLE_HSE')" th:if="${incident.statut.name() == 'DECLARE'}">
+                <button type="submit">Valider</button>
+            </form>
+            <form method="post" th:action="@{/incidents/{id}/take(id=${incident.id})}" sec:authorize="hasAnyRole('ADMIN','RESPONSABLE_HSE','TECHNICIEN')" th:if="${incident.statut.name() != 'CLOTURE' and incident.statut.name() != 'RESOLU'}">
+                <button type="submit">Prendre en charge</button>
+            </form>
+            <form method="post" th:action="@{/incidents/{id}/resolve(id=${incident.id})}" sec:authorize="hasAnyRole('ADMIN','RESPONSABLE_HSE','TECHNICIEN')" th:if="${incident.statut.name() != 'CLOTURE' and incident.statut.name() != 'RESOLU'}">
+                <button class="btn success" type="submit">Marquer resolu</button>
+            </form>
+            <form method="post" th:action="@{/incidents/{id}/close(id=${incident.id})}" sec:authorize="hasAnyRole('ADMIN','RESPONSABLE_HSE')" th:if="${incident.statut.name() != 'CLOTURE'}">
+                <button class="btn success" type="submit">Cloturer</button>
+            </form>
+        </div>
+    </div>
+
+    <section class="metrics">
+        <article><span>Statut</span><strong th:text="${incident.statut}"></strong></article>
+        <article><span>Gravite</span><strong th:text="${incident.gravite}"></strong></article>
+        <article><span>Priorite</span><strong th:text="${incident.priorite + '/5'}"></strong></article>
+        <article><span>Risque</span><strong th:text="${incident.niveauRisque}"></strong></article>
+    </section>
+
+    <section class="panel">
+        <h2>Module intelligent</h2>
+        <div class="columns">
+            <div>
+                <h3>Recommandations</h3>
+                <ul><li th:each="rec : ${recommandations}" th:text="${rec}"></li></ul>
+            </div>
+            <div>
+                <h3>Incidents similaires</h3>
+                <ul><li th:each="sim : ${similaires}" th:text="${sim.reference + ' - ' + sim.titre}"></li></ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Actions correctives</h2>
+        <a class="btn" href="/actions/new" sec:authorize="hasAnyRole('ADMIN','RESPONSABLE_HSE','TECHNICIEN')">Ajouter une action</a>
+        <table>
+            <thead><tr><th>Description</th><th>Responsable</th><th>Echeance</th><th>Etat</th><th>Resultat</th></tr></thead>
+            <tbody>
+            <tr th:each="action : ${actions}">
+                <td th:text="${action.description}"></td>
+                <td th:text="${action.responsable != null ? action.responsable.nomComplet : '-'}"></td>
+                <td th:text="${action.dateEcheance}"></td>
+                <td th:text="${action.etat}"></td>
+                <td th:text="${action.resultat}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="panel">
+        <h2>Commentaires</h2>
+        <form method="post" th:action="@{/commentaires/incident/{id}(id=${incident.id})}">
+            <textarea name="contenu" required></textarea>
+            <button type="submit">Ajouter commentaire</button>
+        </form>
+        <article class="comment" th:each="commentaire : ${commentaires}">
+            <strong th:text="${commentaire.auteur != null ? commentaire.auteur.nomComplet : 'Anonyme'}"></strong>
+            <p th:text="${commentaire.contenu}"></p>
+        </article>
+    </section>
+
+    <section class="panel">
+        <h2>Pieces jointes</h2>
+        <form method="post" enctype="multipart/form-data" th:action="@{/pieces/incident/{id}(id=${incident.id})}">
+            <input type="file" name="file" required>
+            <button type="submit">Uploader</button>
+        </form>
+        <ul><li th:each="piece : ${pieces}" th:text="${piece.nomFichier}"></li></ul>
+    </section>
+
+    <section class="panel">
+        <h2>Historique</h2>
+        <ul class="timeline">
+            <li th:each="h : ${historique}">
+                <strong th:text="${h.actionEffectuee}"></strong>
+                <span th:text="${h.nouvelleValeur}"></span>
+                <small th:text="${#temporals.format(h.dateAction, 'dd/MM/yyyy HH:mm')}"></small>
+            </li>
+        </ul>
+    </section>
+</main>
+</body>
+</html>

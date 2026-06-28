@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Connexion - HSE</title>
+    <link rel="stylesheet" href="/css/app.css">
+</head>
+<body class="login-page">
+<main class="login-card">
+    <h1>Plateforme HSE</h1>
+    <p>Declaration et suivi des incidents en entreprise</p>
+    <p class="flash error" th:if="${param.error}">Email ou mot de passe incorrect.</p>
+    <p class="flash" th:if="${param.logout}">Session fermee.</p>
+    <form method="post" th:action="@{/login}">
+        <label>Email
+            <input name="username" required>
+        </label>
+        <label>Mot de passe
+            <input type="password" name="password" required>
+        </label>
+        <button type="submit">Se connecter</button>
+    </form>
+    <small>Comptes demo: admin@hse.local/admin, hse@hse.local/hse, tech@hse.local/tech</small>
+</main>
+</body>
+</html>

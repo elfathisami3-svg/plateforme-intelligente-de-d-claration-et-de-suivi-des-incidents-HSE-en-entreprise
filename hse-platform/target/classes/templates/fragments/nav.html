@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<nav th:fragment="nav" class="topnav">
+    <a href="/">Dashboard</a>
+    <a href="/incidents">Incidents</a>
+    <a href="/actions" sec:authorize="hasAnyRole('ADMIN','RESPONSABLE_HSE','TECHNICIEN','MANAGER')">Actions correctives</a>
+    <a href="/notifications">Notifications</a>
+    <a href="/reports" sec:authorize="hasAnyRole('ADMIN','RESPONSABLE_HSE','MANAGER')">Rapports</a>
+    <a href="/admin" sec:authorize="hasRole('ADMIN')">Administration</a>
+    <form method="post" th:action="@{/logout}">
+        <button type="submit">Deconnexion</button>
+    </form>
+</nav>
+</body>
+</html>

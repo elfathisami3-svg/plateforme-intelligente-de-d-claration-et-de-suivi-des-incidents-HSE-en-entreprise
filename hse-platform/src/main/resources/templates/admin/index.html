@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>Administration</title><link rel="stylesheet" href="/css/app.css"></head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<main class="container">
+    <h1>Administration</h1>
+    <p class="flash" th:if="${message}" th:text="${message}"></p>
+    <p class="flash error" th:if="${error}" th:text="${error}"></p>
+    <section class="admin-grid">
+        <article class="panel">
+            <h2>Utilisateur</h2>
+            <form method="post" th:action="@{/admin/users}" th:object="${newUser}">
+                <input placeholder="Nom" th:field="*{nom}" required>
+                <input placeholder="Prenom" th:field="*{prenom}" required>
+                <input placeholder="Email" th:field="*{email}" required>
+                <input type="password" placeholder="Mot de passe" th:field="*{motDePasse}" required>
+                <select th:field="*{role}"><option th:each="role : ${roles}" th:value="${role}" th:text="${role}"></option></select>
+                <button type="submit">Ajouter</button>
+            </form>
+        </article>
+        <article class="panel">
+            <h2>Site</h2>
+            <form method="post" th:action="@{/admin/sites}" th:object="${newSite}">
+                <input placeholder="Nom" th:field="*{nom}" required>
+                <input placeholder="Adresse" th:field="*{adresse}">
+                <input placeholder="Ville" th:field="*{ville}">
+                <button type="submit">Ajouter</button>
+            </form>
+        </article>
+        <article class="panel">
+            <h2>Service</h2>
+            <form method="post" th:action="@{/admin/services}" th:object="${newService}">
+                <input placeholder="Nom" th:field="*{nom}" required>
+                <input placeholder="Description" th:field="*{description}">
+                <select th:field="*{site}">
+                    <option value="">Aucun site</option>
+                    <option th:each="site : ${sites}" th:value="${site.id}" th:text="${site.nom}"></option>
+                </select>
+                <button type="submit">Ajouter</button>
+            </form>
+        </article>
+        <article class="panel">
+            <h2>Categorie</h2>
+            <form method="post" th:action="@{/admin/categories}" th:object="${newCategory}">
+                <input placeholder="Libelle" th:field="*{libelle}" required>
+                <input placeholder="Description" th:field="*{description}">
+                <button type="submit">Ajouter</button>
+            </form>
+        </article>
+    </section>
+    <section class="panel">
+        <h2>Utilisateurs</h2>
+        <table>
+            <thead><tr><th>Nom</th><th>Email</th><th>Role</th><th>Actif</th><th></th></tr></thead>
+            <tbody>
+            <tr th:each="u : ${users}">
+                <td colspan="5">
+                    <form class="inline-form admin-user-form" method="post" th:action="@{/admin/users/{id}(id=${u.id})}">
+                        <input name="prenom" th:value="${u.prenom}" required>
+                        <input name="nom" th:value="${u.nom}" required>
+                        <input name="email" th:value="${u.email}" required>
+                        <select name="role">
+                            <option th:each="role : ${roles}" th:value="${role}" th:text="${role}" th:selected="${role == u.role}"></option>
+                        </select>
+                        <input type="password" name="motDePasse" placeholder="Nouveau mot de passe">
+                        <button type="submit">Modifier</button>
+                    </form>
+                    <div class="actions-inline">
+                        <span th:text="${u.actif ? 'Actif' : 'Desactive'}"></span>
+                        <form method="post" th:action="@{/admin/users/{id}/toggle(id=${u.id})}">
+                            <button type="submit" th:text="${u.actif ? 'Desactiver' : 'Activer'}"></button>
+                        </form>
+                        <form method="post" th:action="@{/admin/users/{id}/delete(id=${u.id})}" onsubmit="return confirm('Supprimer cet utilisateur ?')">
+                            <button class="btn danger" type="submit">Supprimer</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+    <section class="panel">
+        <h2>Sites</h2>
+        <table>
+            <thead><tr><th>Nom</th><th>Adresse</th><th>Ville</th><th></th></tr></thead>
+            <tbody>
+            <tr th:each="site : ${sites}">
+                <td th:text="${site.nom}"></td>
+                <td th:text="${site.adresse}"></td>
+                <td th:text="${site.ville}"></td>
+                <td>
+                    <form method="post" th:action="@{/admin/sites/{id}/delete(id=${site.id})}" onsubmit="return confirm('Supprimer ce site ?')">
+                        <button class="btn danger" type="submit">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+    <section class="panel">
+        <h2>Services</h2>
+        <table>
+            <thead><tr><th>Nom</th><th>Description</th><th>Site</th><th></th></tr></thead>
+            <tbody>
+            <tr th:each="service : ${services}">
+                <td th:text="${service.nom}"></td>
+                <td th:text="${service.description}"></td>
+                <td th:text="${service.site != null ? service.site.nom : '-'}"></td>
+                <td>
+                    <form method="post" th:action="@{/admin/services/{id}/delete(id=${service.id})}" onsubmit="return confirm('Supprimer ce service ?')">
+                        <button class="btn danger" type="submit">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+    <section class="panel">
+        <h2>Categories</h2>
+        <table>
+            <thead><tr><th>Libelle</th><th>Description</th><th></th></tr></thead>
+            <tbody>
+            <tr th:each="category : ${categories}">
+                <td th:text="${category.libelle}"></td>
+                <td th:text="${category.description}"></td>
+                <td>
+                    <form method="post" th:action="@{/admin/categories/{id}/delete(id=${category.id})}" onsubmit="return confirm('Supprimer cette categorie ?')">
+                        <button class="btn danger" type="submit">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+    <section class="columns">
+        <article class="panel">
+            <h2>Niveaux de gravite</h2>
+            <ul>
+                <li th:each="gravite : ${gravites}" th:text="${gravite + ' - score ' + gravite.score}"></li>
+            </ul>
+        </article>
+        <article class="panel">
+            <h2>Statuts incidents</h2>
+            <ul>
+                <li th:each="statut : ${statuts}" th:text="${statut}"></li>
+            </ul>
+        </article>
+    </section>
+    <section class="panel">
+        <h2>Configuration notifications</h2>
+        <p>Notifications automatiques actives pour declarations, affectations, actions correctives, resolutions et incidents critiques.</p>
+    </section>
+    <section class="panel">
+        <h2>Journaux d'activite</h2>
+        <table>
+            <thead><tr><th>Date</th><th>Action</th><th>Incident</th><th>Utilisateur</th><th>Valeur</th></tr></thead>
+            <tbody>
+            <tr th:each="h : ${historique}">
+                <td th:text="${#temporals.format(h.dateAction, 'dd/MM/yyyy HH:mm')}"></td>
+                <td th:text="${h.actionEffectuee}"></td>
+                <td th:text="${h.incident != null ? h.incident.reference : '-'}"></td>
+                <td th:text="${h.utilisateur != null ? h.utilisateur.nomComplet : '-'}"></td>
+                <td th:text="${h.nouvelleValeur}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+</body>
+</html>

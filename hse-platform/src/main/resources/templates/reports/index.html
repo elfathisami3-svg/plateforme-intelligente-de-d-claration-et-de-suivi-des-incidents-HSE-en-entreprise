@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>Rapports HSE</title><link rel="stylesheet" href="/css/app.css"></head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<main class="container">
+    <div class="page-title">
+        <h1>Rapports et indicateurs HSE</h1>
+        <button type="button" onclick="window.print()">Generer le rapport</button>
+    </div>
+    <section class="metrics">
+        <article><span>Total incidents</span><strong th:text="${stats.total}">0</strong></article>
+        <article><span>Ouverts</span><strong th:text="${stats.ouverts}">0</strong></article>
+        <article><span>Critiques</span><strong th:text="${stats.critiques}">0</strong></article>
+        <article><span>Clotures</span><strong th:text="${stats.clotures}">0</strong></article>
+        <article><span>Actions en retard</span><strong th:text="${stats.actionsRetard}">0</strong></article>
+    </section>
+    <section class="columns">
+        <article class="panel">
+            <h2>Statuts</h2>
+            <table><tbody><tr th:each="line : ${statuts}"><td th:text="${line.label}"></td><td th:text="${line.count}"></td></tr></tbody></table>
+        </article>
+        <article class="panel">
+            <h2>Gravites</h2>
+            <table><tbody><tr th:each="line : ${gravites}"><td th:text="${line.label}"></td><td th:text="${line.count}"></td></tr></tbody></table>
+        </article>
+    </section>
+    <section class="panel">
+        <h2>Incidents critiques</h2>
+        <table>
+            <thead><tr><th>Reference</th><th>Titre</th><th>Statut</th><th>Echeance</th></tr></thead>
+            <tbody>
+            <tr th:each="incident : ${critiques}">
+                <td th:text="${incident.reference}"></td>
+                <td th:text="${incident.titre}"></td>
+                <td th:text="${incident.statut}"></td>
+                <td th:text="${incident.dateEcheance}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+</body>
+</html>

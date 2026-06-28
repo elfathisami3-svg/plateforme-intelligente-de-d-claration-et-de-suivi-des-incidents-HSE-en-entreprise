@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Incident</title>
+    <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<main class="container">
+    <h1 th:text="${incident.id == null ? 'Declarer un incident' : 'Modifier incident'}"></h1>
+    <form class="panel form-grid" method="post"
+          th:object="${incident}"
+          th:action="${incident.id == null ? '/incidents' : '/incidents/' + incident.id}">
+        <label>Titre<input th:field="*{titre}" required></label>
+        <label>Date incident<input type="date" th:field="*{dateIncident}" required></label>
+        <label class="wide">Description<textarea th:field="*{description}" required></textarea></label>
+        <label>Lieu<input th:field="*{lieu}" required></label>
+        <label>Type
+            <select th:field="*{typeIncident}">
+                <option th:each="type : ${types}" th:value="${type}" th:text="${type}"></option>
+            </select>
+        </label>
+        <label sec:authorize="hasAnyRole('ADMIN','RESPONSABLE_HSE')">Gravite
+            <select th:field="*{gravite}">
+                <option th:each="gravite : ${gravites}" th:value="${gravite}" th:text="${gravite}"></option>
+            </select>
+        </label>
+        <label sec:authorize="hasAnyRole('ADMIN','RESPONSABLE_HSE','TECHNICIEN')">Statut
+            <select th:field="*{statut}">
+                <option th:each="statut : ${statuts}" th:value="${statut}" th:text="${statut}"></option>
+            </select>
+        </label>
+        <label>Site
+            <select th:field="*{site}">
+                <option th:each="site : ${sites}" th:value="${site.id}" th:text="${site.nom}"></option>
+            </select>
+        </label>
+        <label>Service
+            <select th:field="*{service}">
+                <option th:each="service : ${services}" th:value="${service.id}" th:text="${service.nom}"></option>
+            </select>
+        </label>
+        <label>Categorie
+            <select th:field="*{categorie}">
+                <option th:each="categorie : ${categories}" th:value="${categorie.id}" th:text="${categorie.libelle}"></option>
+            </select>
+        </label>
+        <label sec:authorize="hasAnyRole('ADMIN','RESPONSABLE_HSE')">Responsable HSE
+            <select th:field="*{responsableHse}">
+                <option value="">Aucun</option>
+                <option th:each="user : ${responsablesHse}" th:value="${user.id}" th:text="${user.nomComplet}"></option>
+            </select>
+        </label>
+        <label sec:authorize="hasAnyRole('ADMIN','RESPONSABLE_HSE')">Responsable traitement
+            <select th:field="*{responsableTraitement}">
+                <option value="">Aucun</option>
+                <option th:each="user : ${techniciens}" th:value="${user.id}" th:text="${user.nomComplet}"></option>
+            </select>
+        </label>
+        <label sec:authorize="hasAnyRole('ADMIN','RESPONSABLE_HSE','TECHNICIEN')">Cause presumee<input th:field="*{causePresumee}"></label>
+        <label sec:authorize="hasAnyRole('ADMIN','RESPONSABLE_HSE','TECHNICIEN')">Echeance<input type="date" th:field="*{dateEcheance}"></label>
+        <button type="submit">Enregistrer</button>
+    </form>
+</main>
+</body>
+</html>

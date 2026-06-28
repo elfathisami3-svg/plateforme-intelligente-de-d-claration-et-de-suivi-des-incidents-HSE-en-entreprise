@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>Action corrective</title><link rel="stylesheet" href="/css/app.css"></head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<main class="container">
+    <h1>Action corrective</h1>
+    <form class="panel form-grid" method="post" th:action="@{/actions}" th:object="${action}">
+        <label>Incident
+            <select th:field="*{incident}">
+                <option th:each="incident : ${incidents}" th:value="${incident.id}" th:text="${incident.reference + ' - ' + incident.titre}"></option>
+            </select>
+        </label>
+        <label>Responsable
+            <select th:field="*{responsable}">
+                <option th:each="user : ${utilisateurs}" th:value="${user.id}" th:text="${user.nomComplet}"></option>
+            </select>
+        </label>
+        <label class="wide">Description<textarea th:field="*{description}" required></textarea></label>
+        <label>Echeance<input type="date" th:field="*{dateEcheance}"></label>
+        <label>Etat
+            <select th:field="*{etat}">
+                <option th:each="etat : ${etats}" th:value="${etat}" th:text="${etat}"></option>
+            </select>
+        </label>
+        <label class="wide">Resultat<textarea th:field="*{resultat}"></textarea></label>
+        <button type="submit">Enregistrer</button>
+    </form>
+</main>
+</body>
+</html>
